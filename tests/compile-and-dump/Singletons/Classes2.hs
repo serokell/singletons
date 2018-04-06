@@ -5,7 +5,7 @@ import Singletons.Nat
 import Singletons.Classes
 import Data.Singletons
 import Data.Singletons.TH
-import Data.Singletons.Prelude.Ord (EQSym0, LTSym0, GTSym0, Sing(..))
+import Data.Singletons.Prelude.Ord (EQSym0, LTSym0, GTSym0)
 import Language.Haskell.TH.Desugar
 
 

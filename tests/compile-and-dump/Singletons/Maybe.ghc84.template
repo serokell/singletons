@@ -56,11 +56,11 @@ Singletons/Maybe.hs:(0,0)-(0,0): Splicing declarations
       Equals_0123456789876543210 (_ :: Maybe a) (_ :: Maybe a) = FalseSym0
     instance PEq (Maybe a) where
       type (==) a b = Equals_0123456789876543210 a b
-    data instance Sing (z :: Maybe a)
+    data SMaybe (z :: Maybe a)
       where
-        SNothing :: Sing Nothing
-        SJust :: forall a (n :: a). (Sing (n :: a)) -> Sing (Just n)
-    type SMaybe = (Sing :: Maybe a -> GHC.Types.Type)
+        SNothing :: SMaybe Nothing
+        SJust :: forall a (n :: a). (Sing (n :: a)) -> SMaybe (Just n)
+    type instance Sing = (SMaybe :: Maybe a -> GHC.Types.Type)
     instance SingKind a => SingKind (Maybe a) where
       type Demote (Maybe a) = Maybe (Demote a)
       fromSing SNothing = Nothing
@@ -132,7 +132,7 @@ Singletons/Maybe.hs:(0,0)-(0,0): Splicing declarations
                ((Data.Singletons.ShowSing.showsSingPrec 11)
                   arg_0123456789876543210))
     instance Data.Singletons.ShowSing.ShowSing a =>
-             Show (Sing (z :: Maybe a)) where
+             Show (SMaybe (z :: Maybe a)) where
       showsPrec = Data.Singletons.ShowSing.showsSingPrec
     instance SingI Nothing where
       sing = SNothing

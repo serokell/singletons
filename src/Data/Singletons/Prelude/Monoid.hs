@@ -27,11 +27,9 @@
 module Data.Singletons.Prelude.Monoid (
   PMonoid(..), SMonoid(..),
 
-  Sing(SDual, sGetDual, SAll, sGetAll, SAny, sGetAny, SSum, sGetSum,
-       SProduct, sGetProduct, SFirst, sGetFirst, SLast, sGetLast),
+  SDual(..), SAll(..), SAny(..), SSum(..),
+  SProduct(..), SFirst(..), SLast(..),
   GetDual, GetAll, GetAny, GetSum, GetProduct, GetFirst, GetLast,
-
-  SDual, SAll, SAny, SSum, SProduct, SFirst, SLast,
 
   -- ** Defunctionalization symbols
   MemptySym0,
@@ -55,7 +53,7 @@ import Data.Singletons.Prelude.Instances
 import Data.Singletons.Prelude.Num
 import Data.Singletons.Prelude.Ord
 import Data.Singletons.Prelude.Semigroup.Internal hiding
-       (Sing(SFirst, SLast), SFirst, SLast,
+       (SFirst, SLast,
         FirstSym0, FirstSym1, FirstSym0KindInference,
         LastSym0,  LastSym1,  LastSym0KindInference,
         GetFirst,  GetFirstSym0, GetFirstSym1, GetFirstSym0KindInference,

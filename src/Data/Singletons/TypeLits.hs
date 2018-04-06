@@ -18,8 +18,7 @@
 
 module Data.Singletons.TypeLits (
   Nat, Symbol,
-  Sing(SNat, SSym),
-  SNat, SSymbol, withKnownNat, withKnownSymbol,
+  SNat(..), SSymbol(..), withKnownNat, withKnownSymbol,
   Error, sError,
   ErrorWithoutStackTrace, sErrorWithoutStackTrace,
   Undefined, sUndefined,

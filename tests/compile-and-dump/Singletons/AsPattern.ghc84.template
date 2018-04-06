@@ -326,12 +326,12 @@ Singletons/AsPattern.hs:(0,0)-(0,0): Splicing declarations
           sP :: Sing Let0123456789876543210PSym0
           sP = SNothing
         in sP
-    data instance Sing (z :: Baz)
+    data SBaz (z :: Baz)
       where
         SBaz :: forall (n :: Nat) (n :: Nat) (n :: Nat).
                 (Sing (n :: Nat))
-                -> (Sing (n :: Nat)) -> (Sing (n :: Nat)) -> Sing (Baz n n n)
-    type SBaz = (Sing :: Baz -> GHC.Types.Type)
+                -> (Sing (n :: Nat)) -> (Sing (n :: Nat)) -> SBaz (Baz n n n)
+    type instance Sing = (SBaz :: Baz -> GHC.Types.Type)
     instance SingKind Baz where
       type Demote Baz = Baz
       fromSing (SBaz b b b)

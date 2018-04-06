@@ -40,8 +40,8 @@ Singletons/EmptyShowDeriving.hs:(0,0)-(0,0): Splicing declarations
     type instance Apply ShowsPrec_0123456789876543210Sym0 l = ShowsPrec_0123456789876543210Sym1 l
     instance PShow Foo where
       type ShowsPrec a a a = Apply (Apply (Apply ShowsPrec_0123456789876543210Sym0 a) a) a
-    data instance Sing (z :: Foo)
-    type SFoo = (Sing :: Foo -> GHC.Types.Type)
+    data SFoo (z :: Foo)
+    type instance Sing = (SFoo :: Foo -> GHC.Types.Type)
     instance SingKind Foo where
       type Demote Foo = Foo
       fromSing x = case x of
@@ -65,5 +65,5 @@ Singletons/EmptyShowDeriving.hs:(0,0)-(0,0): Splicing declarations
     instance Data.Singletons.ShowSing.ShowSing Foo where
       Data.Singletons.ShowSing.showsSingPrec _ v_0123456789876543210
         = case v_0123456789876543210 of
-    instance Show (Sing (z :: Foo)) where
+    instance Show (SFoo (z :: Foo)) where
       showsPrec = Data.Singletons.ShowSing.showsSingPrec

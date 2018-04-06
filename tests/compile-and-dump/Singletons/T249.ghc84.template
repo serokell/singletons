@@ -31,30 +31,30 @@ Singletons/T249.hs:(0,0)-(0,0): Splicing declarations
       = forall arg. SameKind (Apply MkFoo3Sym0 arg) (MkFoo3Sym1 arg) =>
         MkFoo3Sym0KindInference
     type instance Apply MkFoo3Sym0 l = MkFoo3 l
-    data instance Sing (z :: Foo1 a)
+    data SFoo1 (z :: Foo1 a)
       where
-        SMkFoo1 :: forall a (n :: a). (Sing (n :: a)) -> Sing (MkFoo1 n)
-    type SFoo1 = (Sing :: Foo1 a -> Type)
+        SMkFoo1 :: forall a (n :: a). (Sing (n :: a)) -> SFoo1 (MkFoo1 n)
+    type instance Sing = (SFoo1 :: Foo1 a -> Type)
     instance SingKind a => SingKind (Foo1 a) where
       type Demote (Foo1 a) = Foo1 (Demote a)
       fromSing (SMkFoo1 b) = MkFoo1 (fromSing b)
       toSing (MkFoo1 (b :: Demote a))
         = case toSing b :: SomeSing a of {
             SomeSing c -> SomeSing (SMkFoo1 c) }
-    data instance Sing (z :: Foo2 a)
+    data SFoo2 (z :: Foo2 a)
       where
-        SMkFoo2 :: forall x (n :: x). (Sing (n :: x)) -> Sing (MkFoo2 n)
-    type SFoo2 = (Sing :: Foo2 a -> Type)
+        SMkFoo2 :: forall x (n :: x). (Sing (n :: x)) -> SFoo2 (MkFoo2 n)
+    type instance Sing = (SFoo2 :: Foo2 a -> Type)
     instance SingKind a => SingKind (Foo2 a) where
       type Demote (Foo2 a) = Foo2 (Demote a)
       fromSing (SMkFoo2 b) = MkFoo2 (fromSing b)
       toSing (MkFoo2 (b :: Demote x))
         = case toSing b :: SomeSing x of {
             SomeSing c -> SomeSing (SMkFoo2 c) }
-    data instance Sing (z :: Foo3 a)
+    data SFoo3 (z :: Foo3 a)
       where
-        SMkFoo3 :: forall x (n :: x). (Sing (n :: x)) -> Sing (MkFoo3 n)
-    type SFoo3 = (Sing :: Foo3 a -> Type)
+        SMkFoo3 :: forall x (n :: x). (Sing (n :: x)) -> SFoo3 (MkFoo3 n)
+    type instance Sing = (SFoo3 :: Foo3 a -> Type)
     instance SingKind a => SingKind (Foo3 a) where
       type Demote (Foo3 a) = Foo3 (Demote a)
       fromSing (SMkFoo3 b) = MkFoo3 (fromSing b)

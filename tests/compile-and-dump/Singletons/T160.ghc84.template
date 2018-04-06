@@ -50,7 +50,7 @@ Singletons/T160.hs:(0,0)-(0,0): Splicing declarations
               Sing (Case_0123456789876543210 x (Let0123456789876543210Scrutinee_0123456789876543210Sym1 x) :: a)
 
 Singletons/T160.hs:0:0: error:
-    • t
+    • ConvertPErrorMessage err0
     • In the expression:
         (applySing ((applySing ((singFun2 @($@#@$)) (%$))) sTypeError))
           ((applySing ((singFun1 @ShowTypeSym0) SShowType)) sX)

@@ -39,12 +39,12 @@ Singletons/Records.hs:(0,0)-(0,0): Splicing declarations
       = forall arg. SameKind (Apply MkRecordSym0 arg) (MkRecordSym1 arg) =>
         MkRecordSym0KindInference
     type instance Apply MkRecordSym0 l = MkRecordSym1 l
-    data instance Sing (z :: Record a)
+    data SRecord (z :: Record a)
       where
         SMkRecord :: forall a (n :: a) (n :: Bool).
                      {sField1 :: (Sing (n :: a)), sField2 :: (Sing (n :: Bool))}
-                     -> Sing (MkRecord n n)
-    type SRecord = (Sing :: Record a -> GHC.Types.Type)
+                     -> SRecord (MkRecord n n)
+    type instance Sing = (SRecord :: Record a -> GHC.Types.Type)
     instance SingKind a => SingKind (Record a) where
       type Demote (Record a) = Record (Demote a)
       fromSing (SMkRecord b b) = (MkRecord (fromSing b)) (fromSing b)

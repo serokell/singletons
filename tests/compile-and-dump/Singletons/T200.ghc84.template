@@ -106,16 +106,18 @@ Singletons/T200.hs:(0,0)-(0,0): Splicing declarations
       = (applySing ((applySing ((singFun2 @(:<>:@#@$)) (:%<>:))) sX)) sY
     (%$$:) (sX :: Sing x) (sY :: Sing y)
       = (applySing ((applySing ((singFun2 @(:$$:@#@$)) (:%$$:))) sX)) sY
-    data instance Sing (z :: ErrorMessage)
+    data SErrorMessage (z :: ErrorMessage)
       where
         (:%$$:) :: forall (n :: ErrorMessage) (n :: ErrorMessage).
                    (Sing (n :: ErrorMessage))
-                   -> (Sing (n :: ErrorMessage)) -> Sing ((:$$:) n n)
+                   -> (Sing (n :: ErrorMessage)) -> SErrorMessage ((:$$:) n n)
         (:%<>:) :: forall (n :: ErrorMessage) (n :: ErrorMessage).
                    (Sing (n :: ErrorMessage))
-                   -> (Sing (n :: ErrorMessage)) -> Sing ((:<>:) n n)
-        SEM :: forall (n :: [Bool]). (Sing (n :: [Bool])) -> Sing (EM n)
-    type SErrorMessage = (Sing :: ErrorMessage -> GHC.Types.Type)
+                   -> (Sing (n :: ErrorMessage)) -> SErrorMessage ((:<>:) n n)
+        SEM :: forall (n :: [Bool]).
+               (Sing (n :: [Bool])) -> SErrorMessage (EM n)
+    type instance Sing = (SErrorMessage :: ErrorMessage
+                                           -> GHC.Types.Type)
     instance SingKind ErrorMessage where
       type Demote ErrorMessage = ErrorMessage
       fromSing ((:%$$:) b b) = ((:$$:) (fromSing b)) (fromSing b)

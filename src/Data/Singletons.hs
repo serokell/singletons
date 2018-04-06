@@ -32,7 +32,7 @@
 module Data.Singletons (
   -- * Main singleton definitions
 
-  Sing(SLambda, applySing), (@@),
+  Sing, SLambda(..), (@@),
 
   SingI(..), SingKind(..),
 

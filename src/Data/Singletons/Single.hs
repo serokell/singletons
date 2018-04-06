@@ -141,7 +141,7 @@ singEqualityInstance desc@(_, _, className, _) name = do
   dcons <- concatMapM dsCon cons
   let tyvars = map (DVarT . extractTvbName) dtvbs
       kind = foldType (DConT name) tyvars
-  (scons, _) <- singM [] $ mapM singCtor dcons
+  (scons, _) <- singM [] $ mapM (singCtor name) dcons
   eqInstance <- mkEqualityInstance Nothing kind dcons scons desc
   return $ decToTH eqInstance
 
@@ -194,9 +194,10 @@ showSingInstance name = do
   dcons <- concatMapM dsCon cons
   let tyvars = map (DVarT . extractTvbName) dtvbs
       kind = foldType (DConT name) tyvars
-      deriv_show_decl = DerivedDecl { ded_mb_cxt = Nothing
-                                    , ded_type   = kind
-                                    , ded_cons   = dcons }
+      deriv_show_decl = DerivedDecl { ded_mb_cxt     = Nothing
+                                    , ded_type       = kind
+                                    , ded_type_tycon = name
+                                    , ded_cons       = dcons }
   (show_insts, _) <- singM [] $ singDerivedShowDecs deriv_show_decl
   pure $ decsToTH show_insts
 
@@ -707,10 +708,11 @@ singExp (ADSigE prom_exp exp ty) _ = do
 
 -- See Note [DerivedDecl]
 singDerivedEqDecs :: DerivedEqDecl -> SgM [DDec]
-singDerivedEqDecs (DerivedDecl { ded_mb_cxt = mb_ctxt
-                               , ded_type   = ty
-                               , ded_cons   = cons }) = do
-  (scons, _) <- singM [] $ mapM singCtor cons
+singDerivedEqDecs (DerivedDecl { ded_mb_cxt     = mb_ctxt
+                               , ded_type       = ty
+                               , ded_type_tycon = ty_tycon
+                               , ded_cons       = cons }) = do
+  (scons, _) <- singM [] $ mapM (singCtor ty_tycon) cons
   mb_sctxt <- mapM (mapM singPred) mb_ctxt
   kind <- promoteType ty
   sEqInst <- mkEqualityInstance mb_sctxt kind cons scons sEqClassDesc
@@ -736,9 +738,10 @@ sEqToSDecide = modifyConNameDPred $ \n ->
 
 -- See Note [DerivedDecl]
 singDerivedShowDecs :: DerivedShowDecl -> SgM [DDec]
-singDerivedShowDecs (DerivedDecl { ded_mb_cxt = mb_cxt
-                                 , ded_type   = ty
-                                 , ded_cons   = cons }) = do
+singDerivedShowDecs (DerivedDecl { ded_mb_cxt     = mb_cxt
+                                 , ded_type       = ty
+                                 , ded_type_tycon = ty_tycon
+                                 , ded_cons       = cons }) = do
     -- First, generate the ShowSing instance.
     show_sing_inst <- mkShowInstance ForShowSing mb_cxt ty cons
     z <- qNewName "z"
@@ -752,8 +755,10 @@ singDerivedShowDecs (DerivedDecl { ded_mb_cxt = mb_cxt
     show_cxt <- inferConstraintsDef (fmap (mkShowContext ForShowSing) mb_cxt)
                                     (DConPr showSingName)
                                     ty cons
-    let show_inst = DInstanceD Nothing show_cxt
-                               (DConT showName `DAppT` (singFamily `DAppT` DSigT (DVarT z) ty))
+    let sing_tycon_name = singTyConName ty_tycon
+        show_inst = DInstanceD Nothing show_cxt
+                               (DConT showName `DAppT`
+                                 (DConT sing_tycon_name `DAppT` DSigT (DVarT z) ty))
                                [DLetDec (DFunD showsPrecName
                                                [DClause [] (DVarE showsSingPrecName)])]
     pure [toInstanceD show_sing_inst, show_inst]

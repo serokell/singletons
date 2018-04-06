@@ -23,9 +23,7 @@ module Data.Singletons.Decide (
   (:~:)(..), Void, Refuted, Decision(..)
   ) where
 
-import Data.Kind (Type)
 import Data.Singletons.Internal
-import Data.Type.Coercion
 import Data.Type.Equality
 import Data.Void
 
@@ -51,6 +49,9 @@ class SDecide k where
   (%~) :: forall (a :: k) (b :: k). Sing a -> Sing b -> Decision (a :~: b)
   infix 4 %~
 
+{-
+TODO RGS: Think carefully about this
+
 instance SDecide k => TestEquality (Sing :: k -> Type) where
   testEquality a b =
     case a %~ b of
@@ -62,3 +63,4 @@ instance SDecide k => TestCoercion (Sing :: k -> Type) where
     case a %~ b of
       Proved Refl -> Just Coercion
       Disproved _ -> Nothing
+-}

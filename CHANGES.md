@@ -3,6 +3,8 @@ Changelog for singletons project
 
 2.5
 ---
+* TODO RGS: `Sing` is now a type family. Describe the consequences.
+
 * Template Haskell-generated code may require `TypeInType` in scenarios which
   did not previously require it:
   * `singletons` now explicitly quantifies all kind variables used in explicit

@@ -49,11 +49,11 @@ GradingClient/Database.hs:(0,0)-(0,0): Splicing declarations
       Equals_0123456789876543210 (_ :: Nat) (_ :: Nat) = FalseSym0
     instance PEq Nat where
       type (==) a b = Equals_0123456789876543210 a b
-    data instance Sing (z :: Nat)
+    data SNat (z :: Nat)
       where
-        SZero :: Sing Zero
-        SSucc :: forall (n :: Nat). (Sing (n :: Nat)) -> Sing (Succ n)
-    type SNat = (Sing :: Nat -> Type)
+        SZero :: SNat Zero
+        SSucc :: forall (n :: Nat). (Sing (n :: Nat)) -> SNat (Succ n)
+    type instance Sing = (SNat :: Nat -> Type)
     instance SingKind Nat where
       type Demote Nat = Nat
       fromSing SZero = Zero
@@ -622,14 +622,14 @@ GradingClient/Database.hs:(0,0)-(0,0): Splicing declarations
     sAppend (SSch (sS1 :: Sing s1)) (SSch (sS2 :: Sing s2))
       = (applySing ((singFun1 @SchSym0) SSch))
           ((applySing ((applySing ((singFun2 @(++@#@$)) (%++))) sS1)) sS2)
-    data instance Sing (z :: U)
+    data SU (z :: U)
       where
-        SBOOL :: Sing BOOL
-        SSTRING :: Sing STRING
-        SNAT :: Sing NAT
+        SBOOL :: SU BOOL
+        SSTRING :: SU STRING
+        SNAT :: SU NAT
         SVEC :: forall (n :: U) (n :: Nat).
-                (Sing (n :: U)) -> (Sing (n :: Nat)) -> Sing (VEC n n)
-    type SU = (Sing :: U -> Type)
+                (Sing (n :: U)) -> (Sing (n :: Nat)) -> SU (VEC n n)
+    type instance Sing = (SU :: U -> Type)
     instance SingKind U where
       type Demote U = U
       fromSing SBOOL = BOOL
@@ -644,35 +644,35 @@ GradingClient/Database.hs:(0,0)-(0,0): Splicing declarations
               (GHC.Tuple.(,) (toSing b :: SomeSing U)) (toSing b :: SomeSing Nat)
           of {
             GHC.Tuple.(,) (SomeSing c) (SomeSing c) -> SomeSing ((SVEC c) c) }
-    data instance Sing (z :: AChar)
+    data SAChar (z :: AChar)
       where
-        SCA :: Sing CA
-        SCB :: Sing CB
-        SCC :: Sing CC
-        SCD :: Sing CD
-        SCE :: Sing CE
-        SCF :: Sing CF
-        SCG :: Sing CG
-        SCH :: Sing CH
-        SCI :: Sing CI
-        SCJ :: Sing CJ
-        SCK :: Sing CK
-        SCL :: Sing CL
-        SCM :: Sing CM
-        SCN :: Sing CN
-        SCO :: Sing CO
-        SCP :: Sing CP
-        SCQ :: Sing CQ
-        SCR :: Sing CR
-        SCS :: Sing CS
-        SCT :: Sing CT
-        SCU :: Sing CU
-        SCV :: Sing CV
-        SCW :: Sing CW
-        SCX :: Sing CX
-        SCY :: Sing CY
-        SCZ :: Sing CZ
-    type SAChar = (Sing :: AChar -> Type)
+        SCA :: SAChar CA
+        SCB :: SAChar CB
+        SCC :: SAChar CC
+        SCD :: SAChar CD
+        SCE :: SAChar CE
+        SCF :: SAChar CF
+        SCG :: SAChar CG
+        SCH :: SAChar CH
+        SCI :: SAChar CI
+        SCJ :: SAChar CJ
+        SCK :: SAChar CK
+        SCL :: SAChar CL
+        SCM :: SAChar CM
+        SCN :: SAChar CN
+        SCO :: SAChar CO
+        SCP :: SAChar CP
+        SCQ :: SAChar CQ
+        SCR :: SAChar CR
+        SCS :: SAChar CS
+        SCT :: SAChar CT
+        SCU :: SAChar CU
+        SCV :: SAChar CV
+        SCW :: SAChar CW
+        SCX :: SAChar CX
+        SCY :: SAChar CY
+        SCZ :: SAChar CZ
+    type instance Sing = (SAChar :: AChar -> Type)
     instance SingKind AChar where
       type Demote AChar = AChar
       fromSing SCA = CA
@@ -727,11 +727,11 @@ GradingClient/Database.hs:(0,0)-(0,0): Splicing declarations
       toSing CX = SomeSing SCX
       toSing CY = SomeSing SCY
       toSing CZ = SomeSing SCZ
-    data instance Sing (z :: Attribute)
+    data SAttribute (z :: Attribute)
       where
         SAttr :: forall (n :: [AChar]) (n :: U).
-                 (Sing (n :: [AChar])) -> (Sing (n :: U)) -> Sing (Attr n n)
-    type SAttribute = (Sing :: Attribute -> Type)
+                 (Sing (n :: [AChar])) -> (Sing (n :: U)) -> SAttribute (Attr n n)
+    type instance Sing = (SAttribute :: Attribute -> Type)
     instance SingKind Attribute where
       type Demote Attribute = Attribute
       fromSing (SAttr b b) = (Attr (fromSing b)) (fromSing b)
@@ -741,11 +741,11 @@ GradingClient/Database.hs:(0,0)-(0,0): Splicing declarations
                 (toSing b :: SomeSing U)
           of {
             GHC.Tuple.(,) (SomeSing c) (SomeSing c) -> SomeSing ((SAttr c) c) }
-    data instance Sing (z :: Schema)
+    data SSchema (z :: Schema)
       where
         SSch :: forall (n :: [Attribute]).
-                (Sing (n :: [Attribute])) -> Sing (Sch n)
-    type SSchema = (Sing :: Schema -> Type)
+                (Sing (n :: [Attribute])) -> SSchema (Sch n)
+    type instance Sing = (SSchema :: Schema -> Type)
     instance SingKind Schema where
       type Demote Schema = Schema
       fromSing (SSch b) = Sch (fromSing b)
@@ -2443,7 +2443,7 @@ GradingClient/Database.hs:(0,0)-(0,0): Splicing declarations
                         arg_0123456789876543210))))
     instance (Data.Singletons.ShowSing.ShowSing U,
               Data.Singletons.ShowSing.ShowSing Nat) =>
-             Show (Sing (z :: U)) where
+             Show (SU (z :: U)) where
       showsPrec = Data.Singletons.ShowSing.showsSingPrec
     instance Data.Singletons.ShowSing.ShowSing AChar where
       Data.Singletons.ShowSing.showsSingPrec _ SCA = showString "SCA"
@@ -2472,7 +2472,7 @@ GradingClient/Database.hs:(0,0)-(0,0): Splicing declarations
       Data.Singletons.ShowSing.showsSingPrec _ SCX = showString "SCX"
       Data.Singletons.ShowSing.showsSingPrec _ SCY = showString "SCY"
       Data.Singletons.ShowSing.showsSingPrec _ SCZ = showString "SCZ"
-    instance Show (Sing (z :: AChar)) where
+    instance Show (SAChar (z :: AChar)) where
       showsPrec = Data.Singletons.ShowSing.showsSingPrec
     instance SingI BOOL where
       sing = SBOOL

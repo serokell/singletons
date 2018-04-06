@@ -11,11 +11,11 @@ InsertionSort/InsertionSortImp.hs:(0,0)-(0,0): Splicing declarations
       = forall arg. SameKind (Apply SuccSym0 arg) (SuccSym1 arg) =>
         SuccSym0KindInference
     type instance Apply SuccSym0 l = Succ l
-    data instance Sing (z :: Nat)
+    data SNat (z :: Nat)
       where
-        SZero :: Sing Zero
-        SSucc :: forall (n :: Nat). (Sing (n :: Nat)) -> Sing (Succ n)
-    type SNat = (Sing :: Nat -> Type)
+        SZero :: SNat Zero
+        SSucc :: forall (n :: Nat). (Sing (n :: Nat)) -> SNat (Succ n)
+    type instance Sing = (SNat :: Nat -> Type)
     instance SingKind Nat where
       type Demote Nat = Nat
       fromSing SZero = Zero

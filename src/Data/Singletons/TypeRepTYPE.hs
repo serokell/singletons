@@ -20,11 +20,10 @@
 ----------------------------------------------------------------------------
 
 module Data.Singletons.TypeRepTYPE (
-  Sing(STypeRep),
+  TypeRep,
   -- | Here is the definition of the singleton for @'TYPE' rep@:
   --
-  -- > newtype instance Sing :: forall (rep :: RuntimeRep). TYPE rep -> Type where
-  -- >   STypeRep :: forall (rep :: RuntimeRep) (a :: TYPE rep). TypeRep a -> Sing a
+  -- > type instance Sing = (TypeRep :: TYPE rep -> Type)
   --
   -- Instances for 'SingI', 'SingKind', 'SEq', 'SDecide', 'ShowSing', and
   -- 'TestCoercion' are also supplied.
@@ -56,9 +55,7 @@ import Unsafe.Coerce
 -- We cannot produce explicit singleton values for everything in @'TYPE' rep@,
 -- however, since it is an open kind, so we reach for 'TypeRep' in this one
 -- particular case.
-newtype instance Sing :: forall (rep :: RuntimeRep). TYPE rep -> Type where
-  STypeRep :: forall (rep :: RuntimeRep) (a :: TYPE rep). TypeRep a -> Sing a
-    deriving (Eq, Ord, Show)
+type instance Sing = (TypeRep :: TYPE (rep :: RuntimeRep) -> Type)
 
 -- | A variant of 'SomeTypeRep' whose underlying 'TypeRep' is restricted to
 -- kind @'TYPE' rep@ (for some 'RuntimeRep' @rep@).
@@ -79,11 +76,11 @@ instance Show (SomeTypeRepTYPE rep) where
   showsPrec p (SomeTypeRepTYPE ty) = showsPrec p ty
 
 instance Typeable a => SingI (a :: TYPE rep) where
-  sing = STypeRep typeRep
+  sing = typeRep
 instance SingKind (TYPE rep) where
   type Demote (TYPE rep) = SomeTypeRepTYPE rep
-  fromSing (STypeRep tr) = SomeTypeRepTYPE tr
-  toSing (SomeTypeRepTYPE tr) = SomeSing $ STypeRep tr
+  fromSing = SomeTypeRepTYPE
+  toSing (SomeTypeRepTYPE tr) = SomeSing tr
 
 instance PEq (TYPE rep) where
   type a == b = EqTYPE a b
@@ -93,7 +90,7 @@ type family EqTYPE (a :: TYPE rep) (b :: TYPE rep) where
   EqTYPE a               b               = 'False
 
 instance SEq (TYPE rep) where
-  STypeRep tra %== STypeRep trb =
+  tra %== trb =
     case eqTypeRep tra trb of
       Just HRefl -> STrue
       Nothing    -> unsafeCoerce SFalse
@@ -101,7 +98,7 @@ instance SEq (TYPE rep) where
                     -- to enable us to define this without unsafeCoerce
 
 instance SDecide (TYPE rep) where
-  STypeRep tra %~ STypeRep trb =
+  tra %~ trb =
     case eqTypeRep tra trb of
       Just HRefl -> Proved Refl
       Nothing    -> Disproved (\Refl -> error "Type.Reflection.eqTypeRep failed")

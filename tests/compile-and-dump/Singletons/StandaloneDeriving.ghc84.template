@@ -220,11 +220,11 @@ Singletons/StandaloneDeriving.hs:(0,0)-(0,0): Splicing declarations
     instance PEq S where
       type (==) a b = Equals_0123456789876543210 a b
     infixl 6 :%*:
-    data instance Sing (z :: T a b)
+    data ST (z :: T a b)
       where
         (:%*:) :: forall a b (n :: a) (n :: b).
-                  (Sing (n :: a)) -> (Sing (n :: b)) -> Sing ((:*:) n n)
-    type ST = (Sing :: T a b -> GHC.Types.Type)
+                  (Sing (n :: a)) -> (Sing (n :: b)) -> ST ((:*:) n n)
+    type instance Sing = (ST :: T a b -> GHC.Types.Type)
     instance (SingKind a, SingKind b) => SingKind (T a b) where
       type Demote (T a b) = T (Demote a) (Demote b)
       fromSing ((:%*:) b b) = ((:*:) (fromSing b)) (fromSing b)
@@ -234,11 +234,11 @@ Singletons/StandaloneDeriving.hs:(0,0)-(0,0): Splicing declarations
           of {
             GHC.Tuple.(,) (SomeSing c) (SomeSing c)
               -> SomeSing (((:%*:) c) c) }
-    data instance Sing (z :: S)
+    data SS (z :: S)
       where
-        SS1 :: Sing S1
-        SS2 :: Sing S2
-    type SS = (Sing :: S -> GHC.Types.Type)
+        SS1 :: SS S1
+        SS2 :: SS S2
+    type instance Sing = (SS :: S -> GHC.Types.Type)
     instance SingKind S where
       type Demote S = S
       fromSing SS1 = S1
@@ -423,12 +423,12 @@ Singletons/StandaloneDeriving.hs:(0,0)-(0,0): Splicing declarations
                   ((Data.Singletons.ShowSing.showsSingPrec 10)
                      argR_0123456789876543210)))
     instance Data.Singletons.ShowSing.ShowSing a =>
-             Show (Sing (z :: T a ())) where
+             Show (ST (z :: T a ())) where
       showsPrec = Data.Singletons.ShowSing.showsSingPrec
     instance Data.Singletons.ShowSing.ShowSing S where
       Data.Singletons.ShowSing.showsSingPrec _ SS1 = showString "SS1"
       Data.Singletons.ShowSing.showsSingPrec _ SS2 = showString "SS2"
-    instance Show (Sing (z :: S)) where
+    instance Show (SS (z :: S)) where
       showsPrec = Data.Singletons.ShowSing.showsSingPrec
     instance (SingI n, SingI n) =>
              SingI ((:*:) (n :: a) (n :: b)) where

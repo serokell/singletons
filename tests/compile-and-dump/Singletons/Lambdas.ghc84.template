@@ -677,11 +677,11 @@ Singletons/Lambdas.hs:(0,0)-(0,0): Splicing declarations
                           GHC.Tuple.(,) (_ :: Sing x) (_ :: Sing y) -> sX })))
               sA_0123456789876543210))
           sA_0123456789876543210
-    data instance Sing (z :: Foo a b)
+    data SFoo (z :: Foo a b)
       where
         SFoo :: forall a b (n :: a) (n :: b).
-                (Sing (n :: a)) -> (Sing (n :: b)) -> Sing (Foo n n)
-    type SFoo = (Sing :: Foo a b -> GHC.Types.Type)
+                (Sing (n :: a)) -> (Sing (n :: b)) -> SFoo (Foo n n)
+    type instance Sing = (SFoo :: Foo a b -> GHC.Types.Type)
     instance (SingKind a, SingKind b) => SingKind (Foo a b) where
       type Demote (Foo a b) = Foo (Demote a) (Demote b)
       fromSing (SFoo b b) = (Foo (fromSing b)) (fromSing b)

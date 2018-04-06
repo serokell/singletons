@@ -96,12 +96,12 @@ Singletons/T178.hs:(0,0)-(0,0): Splicing declarations
       type (==) a b = Equals_0123456789876543210 a b
     sEmpty :: Sing (EmptySym0 :: [(Symbol, Occ)])
     sEmpty = Data.Singletons.Prelude.Instances.SNil
-    data instance Sing (z :: Occ)
+    data SOcc (z :: Occ)
       where
-        SStr :: Sing Str
-        SOpt :: Sing Opt
-        SMany :: Sing Many
-    type SOcc = (Sing :: Occ -> GHC.Types.Type)
+        SStr :: SOcc Str
+        SOpt :: SOcc Opt
+        SMany :: SOcc Many
+    type instance Sing = (SOcc :: Occ -> GHC.Types.Type)
     instance SingKind Occ where
       type Demote Occ = Occ
       fromSing SStr = Str
@@ -200,7 +200,7 @@ Singletons/T178.hs:(0,0)-(0,0): Splicing declarations
       Data.Singletons.ShowSing.showsSingPrec _ SStr = showString "SStr"
       Data.Singletons.ShowSing.showsSingPrec _ SOpt = showString "SOpt"
       Data.Singletons.ShowSing.showsSingPrec _ SMany = showString "SMany"
-    instance Show (Sing (z :: Occ)) where
+    instance Show (SOcc (z :: Occ)) where
       showsPrec = Data.Singletons.ShowSing.showsSingPrec
     instance SingI Str where
       sing = SStr

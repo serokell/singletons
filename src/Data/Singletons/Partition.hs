@@ -209,9 +209,17 @@ partitionDeriving mb_strat deriv_pred mb_ctxt ty cons =
   where
       mk_derived_inst    dec = mempty { pd_instance_decs   = [dec] }
       mk_derived_eq_inst dec = mempty { pd_derived_eq_decs = [dec] }
-      mk_derived_decl mb_ctxt' ty' cons' = DerivedDecl { ded_mb_cxt = mb_ctxt'
-                                                       , ded_type   = ty'
-                                                       , ded_cons   = cons' }
+      mk_derived_decl mb_ctxt' ty' cons'
+        = DerivedDecl { ded_mb_cxt     = mb_ctxt'
+                      , ded_type       = ty'
+                      , ded_type_tycon = ty_tycon
+                      , ded_cons       = cons' }
+        where
+          ty_tycon :: Name
+          ty_tycon = case unfoldType ty' of
+                       DConT tc :| _ -> tc
+                       t        :| _ -> error $ "Not a data type: " ++ show t
+
       stock_or_default = isStockOrDefault mb_strat
 
 -- Is this being used with an explicit stock strategy, or no strategy at all?

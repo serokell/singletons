@@ -179,9 +179,10 @@ buildLetDecEnv = go emptyLetDecEnv
 
 -- See Note [DerivedDecl]
 data DerivedDecl (cls :: Type -> Constraint) = DerivedDecl
-  { ded_mb_cxt :: Maybe DCxt
-  , ded_type   :: DType
-  , ded_cons   :: [DCon]
+  { ded_mb_cxt     :: Maybe DCxt
+  , ded_type       :: DType
+  , ded_type_tycon :: Name
+  , ded_cons       :: [DCon]
   }
 
 type DerivedEqDecl   = DerivedDecl Eq
@@ -203,7 +204,8 @@ information to recreate the derived instance:
    a deriving clause (ded_mb_cxt)
 2. The datatype, applied to some number of type arguments, as in the
    instance declaration (ded_type)
-3. The datatype's constructors (ded_cons)
+3. The datatype name (ded_type_tycon), cached for convenience.
+4. The datatype's constructors (ded_cons)
 
 Why are these instances handled outside of partitionDecs?
 

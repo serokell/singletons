@@ -109,11 +109,11 @@ Singletons/DataValues.hs:(0,0)-(0,0): Splicing declarations
            ((applySing ((singFun2 @PairSym0) SPair))
               ((applySing ((singFun1 @SuccSym0) SSucc)) SZero)))
           ((applySing ((applySing ((singFun2 @(:@#@$)) SCons)) SZero)) SNil)
-    data instance Sing (z :: Pair a b)
+    data SPair (z :: Pair a b)
       where
         SPair :: forall a b (n :: a) (n :: b).
-                 (Sing (n :: a)) -> (Sing (n :: b)) -> Sing (Pair n n)
-    type SPair = (Sing :: Pair a b -> GHC.Types.Type)
+                 (Sing (n :: a)) -> (Sing (n :: b)) -> SPair (Pair n n)
+    type instance Sing = (SPair :: Pair a b -> GHC.Types.Type)
     instance (SingKind a, SingKind b) => SingKind (Pair a b) where
       type Demote (Pair a b) = Pair (Demote a) (Demote b)
       fromSing (SPair b b) = (Pair (fromSing b)) (fromSing b)
@@ -175,7 +175,7 @@ Singletons/DataValues.hs:(0,0)-(0,0): Splicing declarations
                         arg_0123456789876543210))))
     instance (Data.Singletons.ShowSing.ShowSing a,
               Data.Singletons.ShowSing.ShowSing b) =>
-             Show (Sing (z :: Pair a b)) where
+             Show (SPair (z :: Pair a b)) where
       showsPrec = Data.Singletons.ShowSing.showsSingPrec
     instance (SingI n, SingI n) => SingI (Pair (n :: a) (n :: b)) where
       sing = (SPair sing) sing

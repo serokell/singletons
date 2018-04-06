@@ -21,6 +21,7 @@ module Data.Singletons.Prelude.Eq (
   type (/=@#@$), type (/=@#@$$), type (/=@#@$$$)
   ) where
 
+import Data.Singletons.Internal
 import Data.Singletons.Prelude.Bool
 import Data.Singletons.Single
 import Data.Singletons.Prelude.Instances
