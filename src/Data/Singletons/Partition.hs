@@ -261,9 +261,15 @@ partitionDeriving mb_strat deriv_pred mb_ctxt ty data_decl =
       mk_derived_eq_inst dec = mempty { pd_derived_eq_decs = [dec] }
 
       derived_decl :: DerivedDecl cls
-      derived_decl = DerivedDecl { ded_mb_cxt = mb_ctxt
-                                 , ded_type   = ty
-                                 , ded_decl   = data_decl }
+      derived_decl = DerivedDecl { ded_mb_cxt     = mb_ctxt
+                                 , ded_type       = ty
+                                 , ded_type_tycon = ty_tycon
+                                 , ded_decl       = data_decl }
+        where
+          ty_tycon :: Name
+          ty_tycon = case unfoldDType ty of
+                       (DConT tc, _) -> tc
+                       (t,        _) -> error $ "Not a data type: " ++ show t
       stock_or_default = isStockOrDefault mb_strat
 
       -- A mapping from all stock derivable classes (that singletons supports)

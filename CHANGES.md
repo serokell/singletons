@@ -1,6 +1,8 @@
 Changelog for singletons project
 ================================
 
+* TODO RGS: Changelog info
+
 2.6
 ---
 * GHC's behavior surrounding kind inference for local definitions has changed

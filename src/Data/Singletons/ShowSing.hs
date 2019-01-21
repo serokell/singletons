@@ -26,9 +26,13 @@
 
 module Data.Singletons.ShowSing (
   -- * The 'ShowSing' type
-  ShowSing
+  ShowSing,
+
+  -- * Internal utilities
+  ShowSing'
   ) where
 
+import Data.Kind
 import Data.Singletons.Internal
 import Data.Singletons.Prelude.Instances
 import Data.Singletons.Single
@@ -86,8 +90,15 @@ import qualified GHC.TypeNats as TN
 -- * A 'Show' instance for the singleton type
 --
 -- What a bargain!
-class    (forall (z :: k). Show (Sing z)) => ShowSing k
-instance (forall (z :: k). Show (Sing z)) => ShowSing k
+
+-- TODO RGS: Describe the hackery involved in more detail.
+-- https://github.com/goldfirere/singletons/issues/318#issuecomment-456172718
+class    (forall (z :: k). ShowSing' z) => ShowSing k
+instance (forall (z :: k). ShowSing' z) => ShowSing k
+
+class    (forall (sing :: k -> Type). sing ~ Sing => Show (sing z))
+                       => ShowSing' (z :: k)
+instance Show (Sing z) => ShowSing' (z :: k)
 
 {-
 Note [Define ShowSing as a class, not a type synonym]

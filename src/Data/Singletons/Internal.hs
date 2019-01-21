@@ -45,8 +45,8 @@ type SameKind (a :: k) (b :: k) = (() :: Constraint)
 ---- Sing & friends --------------------------------------------------
 ----------------------------------------------------------------------
 
--- | The singleton kind-indexed data family.
-data family Sing :: k -> Type
+-- | The singleton kind-indexed type family.
+type family Sing :: k -> Type
 
 -- | A 'SingI' constraint is essentially an implicitly-passed singleton.
 -- If you need to satisfy this constraint with an explicit singleton, please
@@ -265,8 +265,9 @@ type TyCon8 = (TyCon :: (k1 -> k2 -> k3 -> k4 -> k5 -> k6 -> k7 -> k8 -> k9)
 ---- Defunctionalized Sing instance and utilities --------------------
 ----------------------------------------------------------------------
 
-newtype instance Sing (f :: k1 ~> k2) =
+newtype SLambda (f :: k1 ~> k2) =
   SLambda { applySing :: forall t. Sing t -> Sing (f @@ t) }
+type instance Sing = SLambda
 
 -- | An infix synonym for `applySing`
 (@@) :: forall k1 k2 (f :: k1 ~> k2) (t :: k1). Sing f -> Sing t -> Sing (f @@ t)

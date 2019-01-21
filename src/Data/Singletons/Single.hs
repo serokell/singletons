@@ -131,11 +131,13 @@ singEqInstancesOnly = concatMapM singEqInstanceOnly
 singEqInstanceOnly :: DsMonad q => Name -> q [Dec]
 singEqInstanceOnly name = singEqualityInstance sEqClassDesc name
 
--- | Create instances of 'SDecide' for each type in the list.
+-- | Create instances of 'SDecide', 'TestEquality', and 'TestCoercion' for each
+-- type in the list.
 singDecideInstances :: DsMonad q => [Name] -> q [Dec]
 singDecideInstances = concatMapM singDecideInstance
 
--- | Create instance of 'SDecide' for the given type.
+-- | Create instance of 'SDecide', 'TestEquality', and 'TestCoercion' for the
+-- given type.
 singDecideInstance :: DsMonad q => Name -> q [Dec]
 singDecideInstance name = singEqualityInstance sDecideClassDesc name
 
@@ -149,9 +151,14 @@ singEqualityInstance desc@(_, _, className, _) name = do
   dcons <- concatMapM (dsCon dtvbs data_ty) cons
   let tyvars = map (DVarT . extractTvbName) dtvbs
       kind = foldType (DConT name) tyvars
-  (scons, _) <- singM [] $ mapM singCtor dcons
+  (scons, _) <- singM [] $ mapM (singCtor name) dcons
   eqInstance <- mkEqualityInstance Nothing kind dcons scons desc
-  return $ decToTH eqInstance
+  testInstances <-
+    if className == sDecideClassName
+       then traverse (mkTestInstance Nothing kind name dcons)
+                     [TestEquality, TestCoercion]
+       else pure []
+  return $ decsToTH (eqInstance:testInstances)
 
 -- | Create instances of 'SOrd' for the given types
 singOrdInstances :: DsMonad q => [Name] -> q [Dec]
@@ -201,9 +208,10 @@ showSingInstance name = do
   let tyvars    = map (DVarT . extractTvbName) dtvbs
       kind      = foldType (DConT name) tyvars
       data_decl = DataDecl name dtvbs dcons
-      deriv_show_decl = DerivedDecl { ded_mb_cxt = Nothing
-                                    , ded_type   = kind
-                                    , ded_decl   = data_decl }
+      deriv_show_decl = DerivedDecl { ded_mb_cxt     = Nothing
+                                    , ded_type       = kind
+                                    , ded_type_tycon = name
+                                    , ded_decl       = data_decl }
   (show_insts, _) <- singM [] $ singDerivedShowDecs deriv_show_decl
   pure $ decsToTH show_insts
 
@@ -843,12 +851,13 @@ singExp (ADSigE prom_exp exp ty) _ = do
   exp' <- singExp exp (Just ty)
   pure $ DSigE exp' $ DConT singFamilyName `DAppT` DSigT prom_exp ty
 
--- See Note [DerivedDecl]
+-- See Note [DerivedDecl] in Data.Singletons.Syntax
 singDerivedEqDecs :: DerivedEqDecl -> SgM [DDec]
-singDerivedEqDecs (DerivedDecl { ded_mb_cxt = mb_ctxt
-                               , ded_type   = ty
-                               , ded_decl   = DataDecl _ _ cons }) = do
-  (scons, _) <- singM [] $ mapM singCtor cons
+singDerivedEqDecs (DerivedDecl { ded_mb_cxt     = mb_ctxt
+                               , ded_type       = ty
+                               , ded_type_tycon = ty_tycon
+                               , ded_decl       = DataDecl _ _ cons }) = do
+  (scons, _) <- singM [] $ mapM (singCtor ty_tycon) cons
   mb_sctxt <- mapM (mapM singPred) mb_ctxt
   kind <- promoteType ty
   sEqInst <- mkEqualityInstance mb_sctxt kind cons scons sEqClassDesc
@@ -861,7 +870,9 @@ singDerivedEqDecs (DerivedDecl { ded_mb_cxt = mb_ctxt
   -- all occurrences of SEq with SDecide in the context.
   let mb_sctxtDecide = fmap (map sEqToSDecide) mb_sctxt
   sDecideInst <- mkEqualityInstance mb_sctxtDecide kind cons scons sDecideClassDesc
-  return [sEqInst, sDecideInst]
+  testInsts <- traverse (mkTestInstance mb_sctxtDecide kind ty_tycon cons)
+                        [TestEquality, TestCoercion]
+  return (sEqInst:sDecideInst:testInsts)
 
 -- Walk a DPred, replacing all occurrences of SEq with SDecide.
 sEqToSDecide :: DPred -> DPred
@@ -872,15 +883,16 @@ sEqToSDecide = modifyConNameDType $ \n ->
      then sDecideClassName
      else n
 
--- See Note [DerivedDecl]
+-- See Note [DerivedDecl] in Data.Singletons.Syntax
 singDerivedShowDecs :: DerivedShowDecl -> SgM [DDec]
-singDerivedShowDecs (DerivedDecl { ded_mb_cxt = mb_cxt
-                                 , ded_type   = ty
-                                 , ded_decl   = DataDecl _ _ cons }) = do
+singDerivedShowDecs (DerivedDecl { ded_mb_cxt     = mb_cxt
+                                 , ded_type       = ty
+                                 , ded_type_tycon = ty_tycon
+                                 , ded_decl       = DataDecl _ _ cons }) = do
     z <- qNewName "z"
     -- Derive the Show instance for the singleton type, like this:
     --
-    --   deriving instance (ShowSing a, ShowSing b) => Sing (Sing (z :: Either a b))
+    --   deriving instance (ShowSing a, ShowSing b) => Show (SEither (z :: Either a b))
     --
     -- Be careful: we want to generate an instance context that uses ShowSing,
     -- not SShow.
@@ -888,7 +900,8 @@ singDerivedShowDecs (DerivedDecl { ded_mb_cxt = mb_cxt
                                     (DConT showSingName)
                                     ty cons
     let show_inst = DStandaloneDerivD Nothing show_cxt
-                      (DConT showName `DAppT` (singFamily `DAppT` DSigT (DVarT z) ty))
+                      (DConT showName `DAppT` (DConT (singTyConName ty_tycon)
+                                                `DAppT` DSigT (DVarT z) ty))
     pure [show_inst]
 
 isException :: DExp -> Bool

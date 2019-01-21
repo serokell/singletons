@@ -38,7 +38,7 @@
 module Data.Singletons (
   -- * Main singleton definitions
 
-  Sing(SLambda, applySing), (@@),
+  Sing, SLambda(..), (@@),
 
   SingI(..), SingKind(..),
 
@@ -77,6 +77,7 @@ module Data.Singletons (
   Proxy(..),
 
   -- * Defunctionalization symbols
+  SingSym0, SingSym1,
   DemoteSym0, DemoteSym1,
   SameKindSym0, SameKindSym1, SameKindSym2,
   KindOfSym0, KindOfSym1,
@@ -165,8 +166,8 @@ instance SIsString k => IsString (SomeSing k) where
 ---- Defunctionalization symbols -------------------------------------
 ----------------------------------------------------------------------
 
-$(genDefunSymbols [''Demote, ''SameKind, ''KindOf, ''(~>), ''Apply, ''(@@)])
--- SingFunction1 et al. are not defunctionalizable at the moment due to #198
+$(genDefunSymbols [''Sing, ''Demote, ''SameKind, ''KindOf, ''(~>), ''Apply, ''(@@)])
+-- SingFunction1 et al. are not defunctionalizable at the moment due to Trac #9269
 
 {- $SLambdaPatternSynonyms
 
