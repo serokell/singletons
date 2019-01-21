@@ -7,7 +7,7 @@
 {-# LANGUAGE PatternSynonyms #-}
 {-# LANGUAGE PolyKinds #-}
 {-# LANGUAGE QuantifiedConstraints #-}
-{-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeFamilies #-}
@@ -38,7 +38,7 @@
 module Data.Singletons (
   -- * Main singleton definitions
 
-  Sing(SLambda, applySing), (@@),
+  Sing, SLambda(..), (@@),
 
   SingI(..), SingKind(..),
 
@@ -77,6 +77,7 @@ module Data.Singletons (
   Proxy(..),
 
   -- * Defunctionalization symbols
+  SingSym0, SingSym1,
   DemoteSym0, DemoteSym1,
   SameKindSym0, SameKindSym1, SameKindSym2,
   KindOfSym0, KindOfSym1,
@@ -150,7 +151,10 @@ instance SNum k => Num (SomeSing k) where
   signum (SomeSing a) = SomeSing (sSignum a)
   fromInteger n = withSomeSing (fromIntegral n) (SomeSing . sFromInteger)
 
-deriving instance ShowSing k => Show (SomeSing k)
+instance ShowSing k => Show (SomeSing k) where
+  showsPrec p (SomeSing (s :: Sing s)) =
+    showParen (p > 10) $ showString "SomeSing " . showsPrec 11 s
+      :: ShowSing' s => ShowS
 
 instance SSemigroup k => Semigroup (SomeSing k) where
   SomeSing a <> SomeSing b = SomeSing (a %<> b)
@@ -165,8 +169,8 @@ instance SIsString k => IsString (SomeSing k) where
 ---- Defunctionalization symbols -------------------------------------
 ----------------------------------------------------------------------
 
-$(genDefunSymbols [''Demote, ''SameKind, ''KindOf, ''(~>), ''Apply, ''(@@)])
--- SingFunction1 et al. are not defunctionalizable at the moment due to #198
+$(genDefunSymbols [''Sing, ''Demote, ''SameKind, ''KindOf, ''(~>), ''Apply, ''(@@)])
+-- SingFunction1 et al. are not defunctionalizable at the moment due to Trac #9269
 
 {- $SLambdaPatternSynonyms
 
