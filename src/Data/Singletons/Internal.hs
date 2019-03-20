@@ -400,6 +400,31 @@ pattern SLambda8 {applySing8} <- (unSingFun8 -> applySing8)
   where SLambda8 lam8         = singFun8 lam8
 
 ----------------------------------------------------------------------
+---- WrappedSing -----------------------------------------------------
+----------------------------------------------------------------------
+
+-- | TODO RGS: Docs
+newtype WrappedSing :: forall k. k -> Type where
+  WrapSing :: forall k (a :: k). { unwrapSing :: Sing a } -> WrappedSing a
+
+-- | TODO RGS: Docs
+newtype SWrappedSing :: forall k (a :: k). WrappedSing a -> Type where
+  SWrapSing :: forall k (a :: k) (ws :: WrappedSing a).
+               { sUnwrapSing :: Sing a } -> SWrappedSing ws
+type instance Sing = SWrappedSing
+
+type family UnwrapSing (ws :: WrappedSing a) :: Sing a where
+  UnwrapSing ('WrapSing s) = s
+
+instance SingKind (WrappedSing a) where
+  type Demote (WrappedSing a) = WrappedSing a
+  fromSing (SWrapSing s) = WrapSing s
+  toSing (WrapSing s) = SomeSing $ SWrapSing s
+
+instance forall a (s :: Sing a). SingI a => SingI ('WrapSing s) where
+  sing = SWrapSing sing
+
+----------------------------------------------------------------------
 ---- Convenience -----------------------------------------------------
 ----------------------------------------------------------------------
 

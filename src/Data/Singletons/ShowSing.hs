@@ -175,6 +175,11 @@ Given the two options, (2) is by far the easier option, so that is what we
 ultimately went with.
 -}
 
+instance ShowSing k => Show (WrappedSing (a :: k)) where
+  showsPrec p (WrapSing s) =
+    showParen (p > 10) $ showString "WrapSing " . showsPrec 11 s
+      :: ShowSing' a => ShowS
+
 ------------------------------------------------------------
 -- TypeLits instances
 ------------------------------------------------------------

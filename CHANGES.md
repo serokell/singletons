@@ -1,6 +1,8 @@
 Changelog for singletons project
 ================================
 
+* TODO RGS: WrappedSing changelog info
+
 * TODO RGS: Changelog info
 
 2.6

@@ -39,6 +39,7 @@ module Data.Singletons (
   -- * Main singleton definitions
 
   Sing, SLambda(..), (@@),
+  WrappedSing(..), SWrappedSing(..), UnwrapSing,
 
   SingI(..), SingKind(..),
 
@@ -170,7 +171,7 @@ instance SIsString k => IsString (SomeSing k) where
 ----------------------------------------------------------------------
 
 $(genDefunSymbols [''Sing, ''Demote, ''SameKind, ''KindOf, ''(~>), ''Apply, ''(@@)])
--- SingFunction1 et al. are not defunctionalizable at the moment due to Trac #9269
+-- WrapSing, UnwrapSing, and SingFunction1 et al. are not defunctionalizable at the moment due to Trac #9269
 
 {- $SLambdaPatternSynonyms
 
