@@ -92,7 +92,7 @@ qReportError :: Quasi q => String -> q ()
 qReportError = qReport True
 
 -- | Generate a new Unique
-qNewUnique :: DsMonad q => q Int
+qNewUnique :: DsMonad q => q Uniq
 qNewUnique = do
   Name _ flav <- qNewName "x"
   case flav of
@@ -203,7 +203,7 @@ suffixName ident symb n =
 -- convert a number into both alphanumeric and symoblic forms
 uniquePrefixes :: String   -- alphanumeric prefix
                -> String   -- symbolic prefix
-               -> Int
+               -> Uniq
                -> (String, String)  -- (alphanum, symbolic)
 uniquePrefixes alpha symb n = (alpha ++ n_str, symb ++ convert n_str)
   where
