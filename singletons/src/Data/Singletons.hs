@@ -54,6 +54,10 @@ module Data.Singletons (
   Sing, SLambda(..), (@@),
 
   SingI(..), SingKind(..),
+#if __GLASGOW_HASKELL__ >= 806
+  SingI1(..), sing1, withSingI1,
+  SingI2(..), sing2, withSingI2,
+#endif
 
   -- * Working with singletons
   KindOf, SameKind,
@@ -223,6 +227,30 @@ class SingI a where
 pattern Sing :: forall k (a :: k). () => SingI a => Sing a
 pattern Sing <- (singInstance -> SingInstance)
   where Sing = sing
+
+#if __GLASGOW_HASKELL__ >= 806
+-- | A second-order version of 'SingI' that allows lifting the 'SingI'
+-- to unary type constructors similarly to 'Eq1' or 'Ord1'
+class (forall x. SingI x => SingI (f x)) => SingI1 f where
+  liftSing :: Sing x -> Sing (f x)
+
+sing1 :: (SingI1 f, SingI x) => Sing (f x)
+sing1 = liftSing sing
+
+withSingI1 :: forall f x r. (SingI1 f, SingI x) => (SingI (f x) => r) -> r
+withSingI1 k = withSingI (sing1 @f @x) k
+
+-- | A version of 'SingI1' for binary type constructors. The idea is similar
+-- 'Eq2', for example.
+class (forall x y. (SingI x, SingI y) => SingI (f x y)) => SingI2 f where
+  liftSing2 :: Sing x -> Sing y -> Sing (f x y)
+
+sing2 :: (SingI2 f, SingI x, SingI y) => Sing (f x y)
+sing2 = liftSing2 sing sing
+
+withSingI2 :: forall f x y r. (SingI2 f, SingI x, SingI y) => (SingI (f x y) => r) -> r
+withSingI2 k = withSingI (sing2 @f @x @y) k
+#endif
 
 -- | The 'SingKind' class is a /kind/ class. It classifies all kinds
 -- for which singletons are defined. The class supports converting between a singleton
